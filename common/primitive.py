@@ -1,6 +1,6 @@
 import math, numpy
 
-def circle(x=0, y=0, z=0, r=1, v=3):
+def circle(x: 'x座標(number)'=0, y: 'y座標(number)'=0, z: 'z座標(number)'=0, r: '半径(number)'=1, v: '頂点数(number)'=3) -> numpy.ndarray:
     if (r is 0):
         r = 1
     if (v < 3):
@@ -20,7 +20,7 @@ def circle(x=0, y=0, z=0, r=1, v=3):
 
     return vertex
 
-def rect(x=0, y=0, z=0, w=1, h=1):
+def rect(x: 'x座標(number)'=0, y: 'y座標(number)'=0, z: 'z座標(number)'=0, w: '横幅(number)'=1, v: '高さ(number)'=1) -> numpy.ndarray:
     vertex = numpy.array(
         [
             x-(w/2), y+(h/2), z,
