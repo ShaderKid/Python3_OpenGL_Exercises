@@ -1,6 +1,7 @@
 import glfw
 from OpenGL.GL import *
 import numpy, math
+from common.shader import load_shaders
 
 def init():
     if not glfw.init():
@@ -15,17 +16,37 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 600, "Chapter1", None, None)
+    window = glfw.create_window(800, 600, "Chapter2", None, None)
     if not window:
         glfw.terminate()
         return
 
     glfw.make_context_current(window)
     glfw.set_input_mode(window, glfw.STICKY_KEYS, GL_TRUE)
-    glClearColor(1, 0, 0, 1)
+    glClearColor(0, 0, 1, 1)
+
+    vertex_array_id = glGenVertexArrays(1)
+    glBindVertexArray(vertex_array_id)
+    program_id = load_shaders('res/glsl/simple.vs', 'res/glsl/simple.fs')
+
+    vertex = numpy.array([
+        0, 1, 0,
+        -1, -1, 0,
+        1, -1, 0], dtype=numpy.float32)
+
+    vertex_buffer = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+    glBufferData(GL_ARRAY_BUFFER, vertex.nbytes, vertex, GL_STATIC_DRAW)
 
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        glUseProgram(program_id)
+
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        glDrawArrays(GL_TRIANGLE_FAN, 0, int(len(vertex)/3))
 
         glfw.swap_buffers(window)
         glfw.poll_events()
