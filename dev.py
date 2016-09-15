@@ -12,7 +12,6 @@ model = np.matrix(np.identity(4), dtype=np.float32)
 
 mvp = projection * view * model
 
-
 print(projection)
 print(view)
 print(model)
