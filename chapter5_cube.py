@@ -33,9 +33,10 @@ def main():
     program_id = load_shaders('res/glsl/chapter4.vs', 'res/glsl/chapter4.fs')
 
     res_x, res_y = glfw.get_window_size(window)
+    #projection = camera.ortho(-4,4,-3,3,0.1,5.0)
     projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
     view = camera.look_at(
-        numpy.matrix([4,3,3], dtype=numpy.float32),
+        numpy.matrix([2,2,2], dtype=numpy.float32),
         numpy.matrix([0,0,0], dtype=numpy.float32),
         numpy.matrix([0,1,0], dtype=numpy.float32))
     model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)

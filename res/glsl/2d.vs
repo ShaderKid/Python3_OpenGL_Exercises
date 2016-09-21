@@ -1,7 +1,13 @@
 #version 410 core
 
-layout(location = 0) in vec3 Position;
+layout(location = 0) in vec2 Position;
+layout(location = 1) in vec3 Color;
+
+out vec3 fragmentColor;
+
+uniform mat4 projection;
 
 void main() {
-    gl_Position = mat4(vec4(1.0/800,0,0,0), vec4(0,1.0/600,0,0), vec4(0,0,1,0), vec4(0,0,0,1)) * vec4(Position,1);
+  gl_Position = projection * vec4(Position, 0, 1);
+  fragmentColor = Color;
 }

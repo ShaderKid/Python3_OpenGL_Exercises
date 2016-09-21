@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Python3_OpenGL_Exercises.iml" filepath="$PROJECT_DIR$/.idea/Python3_OpenGL_Exercises.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Python3_OpenGL_Exercises.iml" filepath="$PROJECT_DIR$/Python3_OpenGL_Exercises.iml" />
     </modules>
   </component>
 </project>
