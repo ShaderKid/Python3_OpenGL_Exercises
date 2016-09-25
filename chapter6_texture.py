@@ -33,20 +33,17 @@ def main():
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)
     program_id = load_shaders('res/glsl/chapter6.vs', 'res/glsl/chapter6.fs')
-    #tex = texture.load('res/texture/skybox.png')
-    tex = texture.load('res/texture/space/skybox.png')
-    #tex = texture.load('res/texture/interior/skybox.png')
+    tex = texture.load('res/texture/dice.png')
     texture_id = glGetUniformLocation(program_id, "TextureSampler")
 
     res_x, res_y = glfw.get_window_size(window)
     #projection = camera.ortho(-4,4,-3,3,0.1,10.0)
     projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
     view = camera.look_at(
+        numpy.matrix([2,2,2], dtype=numpy.float32),
         numpy.matrix([0,0,0], dtype=numpy.float32),
-        numpy.matrix([1,0,1], dtype=numpy.float32),
         numpy.matrix([0,1,0], dtype=numpy.float32))
-    model = numpy.matrix(numpy.identity(4), dtype=numpy.float32) * 100
-    model[3,3] = 1.0
+    model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)
     mvp = projection * view * model
 
     projection_id = glGetUniformLocation(program_id, 'projection')
@@ -54,58 +51,58 @@ def main():
     model_id = glGetUniformLocation(program_id, 'model')
 
     vertex = numpy.array([
-        #front
-        -1,-1,-1,
-        1,-1,-1,
-        1,1,-1,
-        -1,1,-1,
-        -1,-1,-1,
-        1,1,-1,
-
-        #top
-        -1,1,-1,
-        1,1,-1,
-        1,1,1,
+        #back
+        -1,-1,1,
+        1,-1,1,
         1,1,1,
         -1,1,1,
-        -1,1,-1,
-
-        #left
         -1,-1,1,
-        -1,-1,-1,
-        -1,1,-1,
-        -1,1,-1,
-        -1,1,1,
-        -1,-1,1,
-
-        #right
-        1,-1,-1,
-        1,-1,1,
-        1,1,-1,
-        1,1,-1,
-        1,-1,1,
         1,1,1,
 
         #bottom
-        -1,-1,1,
-        1,-1,1,
-        1,-1,-1,
-        1,-1,-1,
         -1,-1,-1,
-        -1,-1,1,
-
-        #back
+        1,-1,-1,
+        1,-1,1,
         1,-1,1,
         -1,-1,1,
-        -1,1,1,
-        -1,1,1,
+        -1,-1,-1,
+
+        #right
+        1,-1,1,
+        1,-1,-1,
+        1,1,-1,
+        1,1,-1,
         1,1,1,
         1,-1,1,
+
+        #left
+        -1,-1,-1,
+        -1,-1,1,
+        -1,1,-1,
+        -1,1,-1,
+        -1,-1,1,
+        -1,1,1,
+
+        #top
+        -1,1,1,
+        1,1,1,
+        1,1,-1,
+        1,1,-1,
+        -1,1,-1,
+        -1,1,1,
+
+        #front
+        1,-1,-1,
+        -1,-1,-1,
+        -1,1,-1,
+        -1,1,-1,
+        1,1,-1,
+        1,-1,-1,
 
         ], dtype=numpy.float32)
 
     uv = numpy.array([
-        #front
+        #back
         0.25, 0.5,
         0.5, 0.5,
         0.5, 0.25,
@@ -113,45 +110,45 @@ def main():
         0.25, 0.5,
         0.5, 0.25,
 
-        #top
-        0.251, 0.25,
-        0.499, 0.25,
-        0.499, 0.0,
-        0.499, 0.0,
-        0.251, 0.0,
-        0.251, 0.25,
-
-        #left
-        0.0, 0.499,
-        0.25, 0.499,
-        0.25, 0.251,
-        0.25, 0.251,
-        0.0, 0.251,
-        0.0, 0.499,
+        #bottom
+        0.25, 0.25,
+        0.5, 0.25,
+        0.5, 0.0,
+        0.5, 0.0,
+        0.25, 0.0,
+        0.25, 0.25,
 
         #right
-        0.5, 0.499,
-        0.75, 0.499,
-        0.5, 0.251,
-        0.5, 0.251,
-        0.75, 0.499,
-        0.75, 0.251,
+        0.0, 0.5,
+        0.25, 0.5,
+        0.25, 0.25,
+        0.25, 0.25,
+        0.0, 0.25,
+        0.0, 0.5,
 
-        #bottom
-        0.251, 0.75,
-        0.499, 0.75,
-        0.499, 0.5,
-        0.499, 0.5,
-        0.251, 0.5,
-        0.251, 0.75,
+        #left
+        0.5, 0.5,
+        0.75, 0.5,
+        0.5, 0.25,
+        0.5, 0.25,
+        0.75, 0.5,
+        0.75, 0.25,
 
-        #back
-        0.75,0.499,
-        1.0,0.499,
-        1.0,0.251,
-        1.0,0.251,
-        0.75,0.251,
-        0.75,0.499,
+        #top
+        0.25, 0.75,
+        0.5, 0.75,
+        0.5, 0.5,
+        0.5, 0.5,
+        0.25, 0.5,
+        0.25, 0.75,
+
+        #front
+        0.75,0.5,
+        1.0,0.5,
+        1.0,0.25,
+        1.0,0.25,
+        0.75,0.25,
+        0.75,0.5,
         ], dtype=numpy.float32)
 
     vertex_buffer = glGenBuffers(1)
