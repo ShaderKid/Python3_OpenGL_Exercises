@@ -17,7 +17,7 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 600, "Chapter2", None, None)
+    window = glfw.create_window(800, 600, "Chapter4", None, None)
     if not window:
         glfw.terminate()
         return

@@ -5,6 +5,7 @@ def load(path):
     texture = Image.open(path)
     texture_id = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texture_id)
+    #glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, texture.width, texture.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, texture.tobytes()) # アルファ値がある画像
     glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, texture.width, texture.height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture.tobytes())
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
