@@ -2,23 +2,9 @@ import glfw
 from OpenGL.GL import *
 import numpy, math
 from pyassimp import load
-from PIL import Image
 from common.shader import load_shaders
 from common import camera
 from common import texture
-
-def key_callback(window, key, scancode, action, mods):
-    if key == glfw.KEY_S and action == glfw.PRESS and mods == glfw.MOD_SUPER:
-        width,height = glfw.get_window_size(window)
-        rgb_buffer = glReadPixels(0,0,width,height,GL_RGB,GL_UNSIGNED_BYTE)
-        depth_buffer = glReadPixels(0,0,width,height,GL_DEPTH_COMPONENT,GL_UNSIGNED_BYTE)
-        rgb_image = Image.frombytes(mode='RGB', size=(width,height), data=rgb_buffer)
-        depth_image = Image.frombytes(mode='L', size=(width,height), data=depth_buffer)
-        rgb_image = rgb_image.transpose(Image.FLIP_TOP_BOTTOM)
-        depth_image = depth_image.transpose(Image.FLIP_TOP_BOTTOM)
-        rgb_image.save('rgb.png')
-        depth_image.save('depth.png')
-        print('保存しました')
 
 def init():
     if not glfw.init():
@@ -41,7 +27,6 @@ def main():
     glfw.make_context_current(window)
     glfw.set_input_mode(window, glfw.STICKY_KEYS, GL_TRUE)
     glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
-    glfw.set_key_callback(window, key_callback)
     glfw.set_cursor_pos(window, 400, 300)
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import glfw
 from OpenGL.GL import *
 import numpy, math

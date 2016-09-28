@@ -36,13 +36,12 @@ def main():
     program_id = load_shaders('res/glsl/chapter6.vs', 'res/glsl/chapter6.fs')
     tex = texture.load('res/texture/dice.png')
     texture_id = glGetUniformLocation(program_id, 'TextureSampler')
-    time_id = glGetUniformLocation(program_id,'time')
 
     res_x, res_y = glfw.get_window_size(window)
     #projection = camera.ortho(-4,4,-3,3,0.1,10.0)
     projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
     view = camera.look_at(
-        numpy.matrix([0,0,10], dtype=numpy.float32),
+        numpy.matrix([2,2,2], dtype=numpy.float32),
         numpy.matrix([0,0,0], dtype=numpy.float32),
         numpy.matrix([0,1,0], dtype=numpy.float32))
     model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)
@@ -165,8 +164,6 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(program_id)
-        time = glfw.get_time()
-        glUniform1f(time_id, time)
         glUniformMatrix4fv(projection_id, 1, GL_FALSE, projection)
         glUniformMatrix4fv(view_id, 1, GL_FALSE, view)
         glUniformMatrix4fv(model_id, 1, GL_FALSE, model)
