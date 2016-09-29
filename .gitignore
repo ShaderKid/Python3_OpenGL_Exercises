@@ -1,5 +1,7 @@
 
-# Created by https://www.gitignore.io/api/python,pycharm
+# Created by https://www.gitignore.io/api/py,python,pycharm
+
+#!! ERROR: py is undefined. Use list command to see defined gitignore types !!#
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -145,5 +147,7 @@ fabric.properties
 
 *.iml
 modules.xml
-.idea/misc.xml
+.idea/misc.xml 
 *.ipr
+
+.idea

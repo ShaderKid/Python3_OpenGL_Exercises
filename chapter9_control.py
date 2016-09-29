@@ -34,7 +34,7 @@ def main():
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)
-    program_id = load_shaders('res/glsl/chapter8.vs', 'res/glsl/chapter8.fs')
+    program_id = load_shaders('res/glsl/chapter9.vs', 'res/glsl/chapter9.fs')
     tex = texture.load('res/texture/eye.bmp')
     #tex = texture.load('res/texture/earth.bmp')
     texture_id = glGetUniformLocation(program_id, 'TextureSampler')
