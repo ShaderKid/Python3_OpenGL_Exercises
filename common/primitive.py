@@ -1,4 +1,3 @@
-import math
 import numpy as np
 
 def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.ndarray:
@@ -11,9 +10,9 @@ def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.nda
     vertex[0], vertex[1], vertex[2] = x,y,z
 
     for i in range(v+1):
-        a = 2*math.pi/v*i
-        vx = math.cos(a)*r + x
-        vy = math.sin(a)*r + y
+        a = 2*np.pi/v*i+np.pi/2
+        vx = np.cos(a)*r + x
+        vy = np.sin(a)*r + y
         vz = 0 + z
         vertex[3*(i+1)+0] = vx
         vertex[3*(i+1)+1] = vy
@@ -21,7 +20,7 @@ def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.nda
 
     return vertex
 
-def rect(x: float=0, y: float=0, z: float=0, w: float=1, v: float=1) -> np.ndarray:
+def rect(x: float=0, y: float=0, z: float=0, w: float=1, h: float=1) -> np.ndarray:
     vertex = np.array(
         [
             x-(w/2), y+(h/2), z,

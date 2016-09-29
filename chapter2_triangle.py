@@ -23,7 +23,7 @@ def main():
 
     glfw.make_context_current(window)
     glfw.set_input_mode(window, glfw.STICKY_KEYS, GL_TRUE)
-    glClearColor(0, 0, 1, 1)
+    glClearColor(0.3, 0.3, 0.3, 1)
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)

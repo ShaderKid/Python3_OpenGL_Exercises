@@ -2,7 +2,7 @@ import glfw
 from OpenGL.GL import *
 import numpy as np
 from common.shader import load_shaders
-from common import camera
+from common.primitive import circle,rect
 
 def init():
     if not glfw.init():
@@ -17,7 +17,7 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 600, "Chapter3", None, None)
+    window = glfw.create_window(800, 800, "Chapter2", None, None)
     if not window:
         glfw.terminate()
         return
@@ -28,25 +28,18 @@ def main():
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)
-    program_id = load_shaders('res/glsl/chapter3.vs', 'res/glsl/chapter3.fs')
+    program_id = load_shaders('res/glsl/chapter2.vs', 'res/glsl/chapter2.fs')
 
-    vertex = np.array([
-        0, 1, 0,
-        -1, -1, 0,
-        1, -1, 0], dtype=np.float32)
-
-    color = np.array([
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1], dtype=np.float32)
+    #vertex = np.array([
+    #    0, 1, 0,
+    #    -1, -1, 0,
+    #    1, -1, 0], dtype=np.float32)
+    #vertex = circle(0,0,0,0.1,36)
+    vertex = rect(0,0,0,1,1)
 
     vertex_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
     glBufferData(GL_ARRAY_BUFFER, vertex.nbytes, vertex, GL_STATIC_DRAW)
-
-    color_buffer = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, color_buffer)
-    glBufferData(GL_ARRAY_BUFFER, color.nbytes, color, GL_STATIC_DRAW)
 
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -56,14 +49,10 @@ def main():
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-        glEnableVertexAttribArray(1)
-        glBindBuffer(GL_ARRAY_BUFFER, color_buffer)
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-        glDrawArrays(GL_TRIANGLES, 0, int(len(vertex)/3))
+        #glDrawArrays(GL_TRIANGLES, 0, int(len(vertex)/3))
+        #glDrawArrays(GL_TRIANGLE_FAN, 0, int(len(vertex)/3))
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, int(len(vertex)/3))
         glDisableVertexAttribArray(0)
-        glDisableVertexAttribArray(1)
 
         glfw.swap_buffers(window)
         glfw.poll_events()
