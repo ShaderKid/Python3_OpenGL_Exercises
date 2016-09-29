@@ -1,6 +1,6 @@
 import glfw
 from OpenGL.GL import *
-import numpy, math
+import numpy as np
 from pyassimp import load
 from common.shader import load_shaders
 from common import camera
@@ -19,7 +19,7 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 600, "Chapter5", None, None)
+    window = glfw.create_window(800, 600, "Chapter9", None, None)
     if not window:
         glfw.terminate()
         return
@@ -36,18 +36,12 @@ def main():
     glBindVertexArray(vertex_array_id)
     program_id = load_shaders('res/glsl/chapter8.vs', 'res/glsl/chapter8.fs')
     tex = texture.load('res/texture/eye.bmp')
+    #tex = texture.load('res/texture/earth.bmp')
     texture_id = glGetUniformLocation(program_id, 'TextureSampler')
 
     res_x, res_y = glfw.get_window_size(window)
     cam = camera.Camera(0,0,2,res_x,res_y)
-    #projection = camera.ortho(-4,4,-3,3,0.1,5.0)
-    #projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
-    #view = camera.look_at(
-    #    numpy.matrix([0,0,2], dtype=numpy.float32),
-    #    numpy.matrix([0,0,0], dtype=numpy.float32),
-    #    numpy.matrix([0,1,0], dtype=numpy.float32))
-    model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)
-    #mvp = projection * view * model
+    model = np.matrix(np.identity(4), dtype=np.float32)
 
     projection_id = glGetUniformLocation(program_id, 'projection')
     view_id = glGetUniformLocation(program_id, 'view')
@@ -84,8 +78,6 @@ def main():
         glUseProgram(program_id)
         glUniformMatrix4fv(projection_id, 1, GL_FALSE, cam.projection)
         glUniformMatrix4fv(view_id, 1, GL_FALSE, cam.view)
-        #glUniformMatrix4fv(projection_id, 1, GL_FALSE, projection)
-        #glUniformMatrix4fv(view_id, 1, GL_FALSE, view)
         glUniformMatrix4fv(model_id, 1, GL_FALSE, model)
 
         glActiveTexture(GL_TEXTURE0)

@@ -1,6 +1,6 @@
 import glfw
 from OpenGL.GL import *
-import numpy, math
+import numpy as np
 
 def init():
     if not glfw.init():

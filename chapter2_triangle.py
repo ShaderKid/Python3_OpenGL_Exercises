@@ -1,6 +1,6 @@
 import glfw
 from OpenGL.GL import *
-import numpy, math
+import numpy as np
 from common.shader import load_shaders
 
 def init():
@@ -29,10 +29,10 @@ def main():
     glBindVertexArray(vertex_array_id)
     program_id = load_shaders('res/glsl/chapter2.vs', 'res/glsl/chapter2.fs')
 
-    vertex = numpy.array([
+    vertex = np.array([
         0, 1, 0,
         -1, -1, 0,
-        1, -1, 0], dtype=numpy.float32)
+        1, -1, 0], dtype=np.float32)
 
     vertex_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)

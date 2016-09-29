@@ -1,12 +1,13 @@
-import math, numpy
+import math
+import numpy as np
 
-def circle(x: 'x座標(number)'=0, y: 'y座標(number)'=0, z: 'z座標(number)'=0, r: '半径(number)'=1, v: '頂点数(number)'=3) -> numpy.ndarray:
+def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.ndarray:
     if (r is 0):
         r = 1
     if (v < 3):
         v = 3
 
-    vertex = numpy.arange(0, (v+2)*3, dtype=numpy.float32)
+    vertex = np.arange(0, (v+2)*3, dtype=np.float32)
     vertex[0], vertex[1], vertex[2] = x,y,z
 
     for i in range(v+1):
@@ -20,12 +21,12 @@ def circle(x: 'x座標(number)'=0, y: 'y座標(number)'=0, z: 'z座標(number)'=
 
     return vertex
 
-def rect(x: 'x座標(number)'=0, y: 'y座標(number)'=0, z: 'z座標(number)'=0, w: '横幅(number)'=1, v: '高さ(number)'=1) -> numpy.ndarray:
-    vertex = numpy.array(
+def rect(x: float=0, y: float=0, z: float=0, w: float=1, v: float=1) -> np.ndarray:
+    vertex = np.array(
         [
             x-(w/2), y+(h/2), z,
             x-(w/2), y-(h/2), z,
             x+(w/2), y+(h/2), z,
             x+(w/2), y-(h/2), z,
-        ], numpy.float32)
+        ], np.float32)
     return vertex

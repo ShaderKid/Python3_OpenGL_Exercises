@@ -1,6 +1,6 @@
 import glfw
 from OpenGL.GL import *
-import numpy, math
+import numpy as np
 from common.shader import load_shaders
 from common import camera
 
@@ -30,28 +30,15 @@ def main():
     glBindVertexArray(vertex_array_id)
     program_id = load_shaders('res/glsl/chapter3.vs', 'res/glsl/chapter3.fs')
 
-    res_x, res_y = glfw.get_window_size(window)
-    projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
-    view = camera.look_at(
-        numpy.matrix([0,0,-5], dtype=numpy.float32),
-        numpy.matrix([0,0,0], dtype=numpy.float32),
-        numpy.matrix([0,1,0], dtype=numpy.float32))
-    model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)
-    mvp = projection * view * model
-
-    projection_id = glGetUniformLocation(program_id, 'projection')
-    view_id = glGetUniformLocation(program_id, 'view')
-    model_id = glGetUniformLocation(program_id, 'model')
-
-    vertex = numpy.array([
+    vertex = np.array([
         0, 1, 0,
         -1, -1, 0,
-        1, -1, 0], dtype=numpy.float32)
+        1, -1, 0], dtype=np.float32)
 
-    color = numpy.array([
+    color = np.array([
         1, 0, 0,
         0, 1, 0,
-        0, 0, 1], dtype=numpy.float32)
+        0, 0, 1], dtype=np.float32)
 
     vertex_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
@@ -65,9 +52,6 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(program_id)
-        #glUniformMatrix4fv(projection_id, 1, GL_FALSE, projection)
-        #glUniformMatrix4fv(view_id, 1, GL_FALSE, view)
-        #glUniformMatrix4fv(model_id, 1, GL_FALSE, model)
 
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)

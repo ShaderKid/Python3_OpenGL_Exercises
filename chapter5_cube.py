@@ -1,6 +1,6 @@
 import glfw
 from OpenGL.GL import *
-import numpy, math
+import numpy as np
 from common.shader import load_shaders
 from common import camera
 
@@ -36,17 +36,16 @@ def main():
     #projection = camera.ortho(-4,4,-3,3,0.1,5.0)
     projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
     view = camera.look_at(
-        numpy.matrix([2,2,2], dtype=numpy.float32),
-        numpy.matrix([0,0,0], dtype=numpy.float32),
-        numpy.matrix([0,1,0], dtype=numpy.float32))
-    model = numpy.matrix(numpy.identity(4), dtype=numpy.float32)
-    mvp = projection * view * model
+        np.matrix([2,2,2], dtype=np.float32),
+        np.matrix([0,0,0], dtype=np.float32),
+        np.matrix([0,1,0], dtype=np.float32))
+    model = np.matrix(np.identity(4), dtype=np.float32)
 
     projection_id = glGetUniformLocation(program_id, 'projection')
     view_id = glGetUniformLocation(program_id, 'view')
     model_id = glGetUniformLocation(program_id, 'model')
 
-    vertex = numpy.array([
+    vertex = np.array([
         -1,-1,-1,
         1,-1,-1,
         1,1,-1,
@@ -89,30 +88,9 @@ def main():
         -1,1,1,
         1,1,1,
 
-        ], dtype=numpy.float32)
+        ], dtype=np.float32)
 
-    color = numpy.array([
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-
+    color = np.array([
         1, 0, 0,
         1, 0, 0,
         1, 0, 0,
@@ -134,7 +112,28 @@ def main():
         0, 0, 1,
         0, 0, 1,
 
-        ], dtype=numpy.float32)
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+
+        ], dtype=np.float32)
 
     vertex_buffer = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
