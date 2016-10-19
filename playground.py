@@ -17,7 +17,7 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 800, "Chapter2", None, None)
+    window = glfw.create_window(80, 80, "Chapter2", None, None)
     if not window:
         glfw.terminate()
         return
@@ -28,7 +28,31 @@ def main():
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)
-    program_id = load_shaders('res/glsl/chapter2.vs', 'res/glsl/chapter2.fs')
+    program_id = load_shaders('res/glsl/playground.vs', 'res/glsl/playground.fs')
+
+    scale_id = glGetUniformLocation(program_id, 'scale')
+    rotation_id = glGetUniformLocation(program_id, 'rotation')
+    translation_id = glGetUniformLocation(program_id, 'translation')
+    time_id = glGetUniformLocation(program_id, 'time')
+
+    scale = np.matrix([
+        2, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+        ],dtype=np.float32)
+    rotation = np.matrix([
+        np.cos(np.pi/4), np.sin(np.pi/4), 0, 0,
+        -np.sin(np.pi/4), np.cos(np.pi/4), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+        ],dtype=np.float32)
+    translation = np.matrix([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0.5, 0, 0, 1,
+        ],dtype=np.float32)
 
     #vertex = np.array([
     #    0, 1, 0,
@@ -45,6 +69,11 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glUseProgram(program_id)
+
+        glUniformMatrix4fv(scale_id, 1, GL_FALSE, scale)
+        glUniformMatrix4fv(rotation_id, 1, GL_FALSE, rotation)
+        glUniformMatrix4fv(translation_id, 1, GL_FALSE, translation)
+        glUniform1f(time_id, glfw.get_time())
 
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
