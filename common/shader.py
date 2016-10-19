@@ -2,7 +2,7 @@ import OpenGL
 from OpenGL.GL import *
 from OpenGL.GL.shaders import *
 
-def load_shaders(vpath: '頂点シェーダーのファイルパス(str)', fpath: 'フラグメントシェーダーのファイルパス(str)'):
+def load_shaders(vpath: 'vertex path(str)', fpath: 'fragment path(str)'):
     vs = open(vpath, encoding='utf-8')
     fs = open(fpath, encoding='utf-8')
     vertex = vs.read()
