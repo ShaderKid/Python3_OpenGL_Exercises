@@ -78,11 +78,14 @@ def main():
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        xpos,ypos = glfw.get_cursor_pos(window)
-        player.x = (xpos/res_x)*2-1
-        player.y = (1-ypos/res_y)*2-1
+        player.x = ball.x
+        player.y = ball.y
+
+        #xpos,ypos = glfw.get_cursor_pos(window)
+        #player.x = (xpos/res_x)*2-1
+        #player.y = (1-ypos/res_y)*2-1
         if (player.z < ball.z + ball._radius) and (player.x - player._w/2 < ball.x < player.x + player._w/2) and (player.y - player._h/2 < ball.y < player.y + player._h/2):
-            ball._vz = -np.abs(ball._vz)
+            ball._vz = -np.abs(ball._vz*1.01)
 
         player.update()
         ball.update()
