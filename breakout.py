@@ -33,112 +33,98 @@ def main():
     glBindVertexArray(vertex_array_id)
 
     res_x, res_y = glfw.get_window_size(window)
-    #projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
-    projection = camera.ortho(-1,1,-1,1,0.1,10.0)
+    projection = camera.perspective(45.0, res_x/res_y, 0.1, 100.0)
+    #projection = camera.ortho(-1,1,-1,1,0.1,10.0)
     view = camera.look_at(
         np.matrix([0,0,0], dtype=np.float32),
-        np.matrix([0,0,-3], dtype=np.float32),
-        #np.matrix([0,0,-10], dtype=np.float32),
+        np.matrix([0,0,-10], dtype=np.float32),
         np.matrix([0,1,0], dtype=np.float32))
     model = np.matrix(np.identity(4), dtype=np.float32)
+
+    player = breakout.Player(0,0,-1.4,0.5,0.5)
+    player.projection = projection
+    player.view = view
+    player.set_shaders('res/glsl/breakout_player.vs', 'res/glsl/breakout_player.fs')
 
     wall = breakout.Wall()
     wall.projection = projection
     wall.view = view
     wall.set_shaders('res/glsl/breakout_wall.vs', 'res/glsl/breakout_wall.fs')
 
-    #blocks = []
-    #X_NUM = 5
-    #Y_NUM = 5
-    #Z_NUM = 5
-    #X_SIZE = (2-(X_NUM+1)*0.05)/X_NUM
-    #Y_SIZE = (2-(Y_NUM+1)*0.05)/Y_NUM
-    #Z_SIZE = X_SIZE
-    #for z in range(Z_NUM):
-    #    for y in range(Y_NUM):
-    #        for x in range(X_NUM):
-    #            block = breakout.Block(0.05+X_SIZE/2+x*(X_SIZE+0.05)-1,0.05+Y_SIZE/2+y*(Y_SIZE+0.05)-1,-10+0.05+Z_SIZE/2+z*(Z_SIZE+0.05),X_SIZE,Y_SIZE,X_SIZE)
-    #            block.projection = projection
-    #            block.view = view
-    #            block.set_shaders('res/glsl/breakout_block.vs', 'res/glsl/breakout_block.fs')
-    #            blocks.append(block)
-    block = breakout.Block(0,0,-3,0.3,0.2,0.4)
-    block.projection = projection
-    block.view = view
-    block.set_shaders('res/glsl/breakout_block.vs', 'res/glsl/breakout_block.fs')
+    blocks = []
+    X_NUM = 5
+    Y_NUM = 5
+    Z_NUM = 5
+    X_SIZE = (2-(X_NUM+1)*0.05)/X_NUM
+    Y_SIZE = (2-(Y_NUM+1)*0.05)/Y_NUM
+    Z_SIZE = X_SIZE
+    for z in range(Z_NUM):
+        for y in range(Y_NUM):
+            for x in range(X_NUM):
+                block = breakout.Block(0.05+X_SIZE/2+x*(X_SIZE+0.05)-1,0.05+Y_SIZE/2+y*(Y_SIZE+0.05)-1,-10+0.05+Z_SIZE/2+z*(Z_SIZE+0.05),X_SIZE,Y_SIZE,X_SIZE)
+                block.projection = projection
+                block.view = view
+                block.set_shaders('res/glsl/breakout_block.vs', 'res/glsl/breakout_block.fs')
+                blocks.append(block)
 
-    #ball = breakout.Ball(0,0,-1.5,0.1)
-    ball = breakout.Ball(0,0,-3,0.1)
+    ball = breakout.Ball(0,0,-1.5,0.1)
     ball.projection = projection
     ball.view = view
     ball.set_shaders('res/glsl/breakout_ball.vs', 'res/glsl/breakout_ball.fs')
 
-    vx = np.random.rand() / 30 + 0.01
-    vy = np.random.rand() / 20 + 0.01
-    vz = 0.1
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    count_x = 0
-    count_y = 0
-    count_z = 0
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         xpos,ypos = glfw.get_cursor_pos(window)
-        ball.x = (xpos/res_x)*2-1
-        ball.y = (1-ypos/res_y)*2-1
-        #ball.z = ((1-ypos/res_y)*2-1)*-1-3
-        #ball.x += vx
-        #ball.y += vy
-        #ball.z += vz
+        player.x = (xpos/res_x)*2-1
+        player.y = (1-ypos/res_y)*2-1
+        if (player.z < ball.z + ball._radius) and (player.x - player._w/2 < ball.x < player.x + player._w/2) and (player.y - player._h/2 < ball.y < player.y + player._h/2):
+            ball._vz = -np.abs(ball._vz)
 
-        #if ball.x + ball._radius > 1:
-        #    ball.x = 1 - ball._radius
-        #    vx *= -1.001
-        #elif ball.x - ball._radius < -1:
-        #    ball.x = -1 + ball._radius
-        #    vx *= -1.001
-        #if ball.y + ball._radius > 1:
-        #    ball.y = 1 - ball._radius
-        #    vy *= -1.001
-        #elif ball.y - ball._radius < -1:
-        #    ball.y = -1 + ball._radius
-        #    vy *= -1.001
-        #if ball.z + ball._radius > -1.5:
-        #    ball.z = -1.5 - ball._radius
-        #    vz *= -1.001
-        #elif ball.z - ball._radius < -10:
-        #    ball.z = -10 + ball._radius
-        #    vz *= -1.001
+        player.update()
+        ball.update()
 
-        #wall.render()
+        wall.render()
 
-        #new_blocks = []
-        #for block in blocks:
-        #    block.render()
-        #    if (ball.z - ball._radius < block.z + block._d/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
-        #        ball.z = block.z + block._d/2
-        #        vz *= -1.001
-        #    else:
-        #        new_blocks.append(block)
-
-        #blocks = new_blocks
-        if (block.z - block._d/2 < ball.z - ball._radius < block.z + block._d/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2) or (block.z - block._d/2 < ball.z + ball._radius < block.z + block._d/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
-            count_z += 1
-            print('Z-hit',count_z)
-
-        if (block.x - block._w/2 < ball.x - ball._radius < block.x + block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2) or (block.x - block._w/2 < ball.x + ball._radius < block.x + block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
-            count_x += 1
-            print('X-hit',count_x)
-
-        if (block.y - block._h/2 < ball.y - ball._radius < block.y + block._h/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2) or (block.y - block._h/2 < ball.y + ball._radius < block.y + block._h/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2):
-            count_y += 1
-            print('Y-hit',count_y)
-
-
-        block.render()
-
+        for block in blocks:
+            if block.visible:
+                if (block.x - block._w/2 < ball.x - ball._radius < block.x + block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
+                    print('X-hit')
+                    ball._vx = np.abs(ball._vx)
+                    block.visible = False
+                    continue
+                elif (block.x - block._w/2 < ball.x + ball._radius < block.x + block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
+                    print('X-hit')
+                    ball._vx = -np.abs(ball._vx)
+                    block.visible = False
+                    continue
+                if (block.y - block._h/2 < ball.y - ball._radius < block.y + block._h/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2):
+                    print('Y-hit')
+                    ball._vy = np.abs(ball._vy)
+                    block.visible = False
+                    continue
+                elif (block.y - block._h/2 < ball.y + ball._radius < block.y + block._h/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.z-block._d/2 < ball.z < block.z+block._d/2):
+                    print('Y-hit')
+                    ball._vy = -np.abs(ball._vy)
+                    block.visible = False
+                    continue
+                if (block.z - block._d/2 < ball.z - ball._radius < block.z + block._d/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
+                    print('Z-hit')
+                    ball._vz = np.abs(ball._vz)
+                    block.visible = False
+                    continue
+                elif (block.z - block._d/2 < ball.z + ball._radius < block.z + block._d/2) and (block.x-block._w/2 < ball.x < block.x+block._w/2) and (block.y-block._h/2 < ball.y < block.y+block._h/2):
+                    print('Z-hit')
+                    ball._vz = -np.abs(ball._vz)
+                    block.visible = False
+                    continue
+            block.render()
 
         ball.render()
+        player.render()
 
         glfw.swap_buffers(window)
         glfw.poll_events()
