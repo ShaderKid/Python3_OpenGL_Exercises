@@ -84,7 +84,7 @@ def main():
         #xpos,ypos = glfw.get_cursor_pos(window)
         #player.x = (xpos/res_x)*2-1
         #player.y = (1-ypos/res_y)*2-1
-        if (player.z < ball.z + ball._radius) and (player.x - player._w/2 < ball.x < player.x + player._w/2) and (player.y - player._h/2 < ball.y < player.y + player._h/2):
+        if (player.z < ball.z + ball._radius < player.z + 0.3) and (player.x - player._w/2 < ball.x < player.x + player._w/2) and (player.y - player._h/2 < ball.y < player.y + player._h/2):
             ball._vz = -np.abs(ball._vz*1.01)
 
         player.update()

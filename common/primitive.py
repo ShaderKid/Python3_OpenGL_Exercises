@@ -1,5 +1,17 @@
 import numpy as np
 
+#def grid(w_num: int=1, h_num: int=1) -> np.ndarray:
+#    if w_num == 0:
+#        w_num = 1
+#    if h_num == 0:
+#        h_num = 1
+#
+#    vertex = np.arange(0, (w_num+1+h_num+1)*2, dtype=np.float32)
+#    for w in range(w_num+1):
+#
+#
+#    return vertex
+
 def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.ndarray:
     if (r is 0):
         r = 1

@@ -290,8 +290,9 @@ class Ball(Model):
             self._vy = -np.abs(self._vy)
         elif self.y - self._radius < -1:
             self._vy = np.abs(self._vy)
-        if self.z - self._radius > -1.4:
-            sys.exit()
+        if self.z - self._radius > -1:
+            pass
+            #sys.exit()
             #self._vz = -np.abs(self._vz)
         elif self.z - self._radius < -10:
             self._vz = np.abs(self._vz)
