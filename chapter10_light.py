@@ -16,9 +16,10 @@ class Model:
 
     def set_shaders(self, vpath, fpath):
         self._program = load_shaders(vpath, fpath)
-        self._projection_id = glGetUniformLocation(self._program, 'projection')
-        self._view_id= glGetUniformLocation(self._program, 'view')
-        self._model_id = glGetUniformLocation(self._program, 'model')
+        self._projection_id = glGetUniformLocation(self._program, 'P')
+        self._view_id= glGetUniformLocation(self._program, 'V')
+        self._model_id = glGetUniformLocation(self._program, 'M')
+        self._light_id = glGetUniformLocation(self._program, 'LightPosition_w');
 
     def get_projection(self):
         return self._projection
@@ -79,6 +80,10 @@ class Sphere(Model):
 
     def render(self):
         super().render()
+
+        lightPos = np.array([4,4,4], dtype=np.float32)
+        glUniform3f(self._light_id, lightPos[0], lightPos[1], lightPos[2])
+
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self._tex)
         glUniform1i(self._texture_id, 0)
@@ -115,7 +120,7 @@ def init():
 def main():
     init()
 
-    window = glfw.create_window(800, 600, "Chapter9", None, None)
+    window = glfw.create_window(800, 600, "Chapter10", None, None)
     if not window:
         glfw.terminate()
         return
@@ -134,7 +139,7 @@ def main():
     cam = camera.Camera(0,0,2,res_x,res_y)
 
     eye = Sphere()
-    eye.set_shaders('res/glsl/chapter9.vs', 'res/glsl/chapter9.fs')
+    eye.set_shaders('res/glsl/chapter10.vs', 'res/glsl/chapter10.fs')
 
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
