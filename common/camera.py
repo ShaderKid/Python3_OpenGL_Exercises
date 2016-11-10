@@ -83,8 +83,8 @@ class Camera:
         self.__far = 100.0
         self.projection = None
         self.view = None
-        self.__horizontal_angle = 3.14
-        self.__vertical_angle = 0.0
+        self.__horizontal_angle = np.pi# 水平角, -Z方向
+        self.__vertical_angle = 0.0# 鉛直角
         self.__speed = 3.0
         self.__mouse_speed = 0.001
         self.__last_time = None
@@ -104,28 +104,24 @@ class Camera:
         if self.__last_xpos is None or self.__last_ypos is None:
             self.__last_xpos, self.__last_ypos = xpos, ypos
 
-        #if not (-0.3 < float(width//2-xpos)/(width/2) < 0.3):
-        #    self.__horizontal_angle += self.__mouse_speed * float(width//2 - xpos)/(width/2)
-        #if not (-0.3 < float(height//2-ypos)/(height/2) < 0.3):
-        #    self.__vertical_angle += self.__mouse_speed *  float(height//2 - ypos)/(height/2)
-        #glfw.set_cursor_pos(window, width//2, height//2)
-        #self.__horizontal_angle += self.__mouse_speed * float(width//2 - xpos)/(width/2)
-        #self.__vertical_angle += self.__mouse_speed * float(height//2 - ypos)/(height/2)
         self.__horizontal_angle += self.__mouse_speed * float(self.__last_xpos - xpos)
         self.__vertical_angle += self.__mouse_speed * float(self.__last_ypos - ypos)
 
+        # カメラの向いている方向:球面座標から直交座標への変換
         direction = np.matrix([
             np.cos(self.__vertical_angle) * np.sin(self.__horizontal_angle),
             np.sin(self.__vertical_angle),
             np.cos(self.__vertical_angle) * np.cos(self.__horizontal_angle)
         ], dtype=np.float32)
 
+        # カメラの右方向
         right = np.matrix([
             np.sin(self.__horizontal_angle - np.pi/2.0),
             0,
             np.cos(self.__horizontal_angle - np.pi/2.0)
         ], dtype=np.float32)
 
+        # カメラの上方向:右方向と正面方向の外積
         self.__up = np.cross(right, direction)
 
         if glfw.get_key(window, glfw.KEY_DOWN) is glfw.PRESS:
