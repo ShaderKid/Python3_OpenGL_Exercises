@@ -6,6 +6,102 @@ from common.shader import load_shaders
 from common import camera
 from common import texture
 
+class Model:
+    def __init__(self):
+        self._vertex = None
+        self._program = None
+        self._projection = None
+        self._view = None
+        self._model = np.matrix(np.identity(4), dtype=np.float32)
+
+    def set_shaders(self, vpath, fpath):
+        self._program = load_shaders(vpath, fpath)
+        self._projection_id = glGetUniformLocation(self._program, 'projection')
+        self._view_id= glGetUniformLocation(self._program, 'view')
+        self._model_id = glGetUniformLocation(self._program, 'model')
+
+    def get_projection(self):
+        return self._projection
+
+    def set_projection(self,p):
+        self._projection = p
+
+    def get_view(self):
+        return self._view
+
+    def set_view(self,v):
+        self._view = v
+
+    def update(self):
+        pass
+
+    def render(self):
+        glUseProgram(self._program)
+
+        glUniformMatrix4fv(self._projection_id, 1, GL_FALSE, self._projection)
+        glUniformMatrix4fv(self._view_id, 1, GL_FALSE, self._view)
+        glUniformMatrix4fv(self._model_id, 1, GL_FALSE, self._model)
+
+    projection = property(get_projection, set_projection)
+    view = property(get_view, set_view)
+
+class Sphere(Model):
+    def __init__(self):
+        super().__init__()
+
+        self._tex = texture.load('res/texture/eye.bmp')
+        scene = load('res/model/sphere.obj')
+        mesh = scene.meshes[0]
+        self._vertex = mesh.vertices
+        self._uv = mesh.texturecoords
+        self._normal = mesh.normals
+        self._index = mesh.faces
+
+        self._vertex_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._vertex.nbytes, self._vertex, GL_STATIC_DRAW)
+
+        self._uv_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._uv_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._uv.nbytes, self._uv, GL_STATIC_DRAW)
+
+        self._normal_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._normal_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._normal.nbytes, self._normal, GL_STATIC_DRAW)
+
+        self._element_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, self._index.nbytes, self._index, GL_STATIC_DRAW)
+
+    def set_shaders(self, vpath, fpath):
+        super().set_shaders(vpath, fpath)
+        self._texture_id = glGetUniformLocation(self._program, 'TextureSampler')
+
+    def render(self):
+        super().render()
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self._tex)
+        glUniform1i(self._texture_id, 0)
+
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glEnableVertexAttribArray(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._uv_buffer)
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glEnableVertexAttribArray(2)
+        glBindBuffer(GL_ARRAY_BUFFER, self._normal_buffer)
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glDrawElements(GL_TRIANGLES, self._index.nbytes, GL_UNSIGNED_INT, None)
+
+        glDisableVertexAttribArray(0)
+        glDisableVertexAttribArray(1)
+        glDisableVertexAttribArray(2)
+
 def init():
     if not glfw.init():
         return
@@ -34,74 +130,20 @@ def main():
 
     vertex_array_id = glGenVertexArrays(1)
     glBindVertexArray(vertex_array_id)
-    program_id = load_shaders('res/glsl/chapter9.vs', 'res/glsl/chapter9.fs')
-    tex = texture.load('res/texture/eye.bmp')
-    #tex = texture.load('res/texture/earth.bmp')
-    texture_id = glGetUniformLocation(program_id, 'TextureSampler')
 
     res_x, res_y = glfw.get_window_size(window)
     cam = camera.Camera(0,0,2,res_x,res_y)
-    model = np.matrix(np.identity(4), dtype=np.float32)
 
-    projection_id = glGetUniformLocation(program_id, 'projection')
-    view_id = glGetUniformLocation(program_id, 'view')
-    model_id = glGetUniformLocation(program_id, 'model')
-
-    scene = load('res/model/sphere.obj')
-    mesh = scene.meshes[0]
-    vertex = mesh.vertices
-    uv = mesh.texturecoords
-    normal = mesh.normals
-    index = mesh.faces
-
-    vertex_buffer = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-    glBufferData(GL_ARRAY_BUFFER, vertex.nbytes, vertex, GL_STATIC_DRAW)
-
-    uv_buffer = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
-    glBufferData(GL_ARRAY_BUFFER, uv.nbytes, uv, GL_STATIC_DRAW)
-
-    normal_buffer = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)
-    glBufferData(GL_ARRAY_BUFFER, normal.nbytes, normal, GL_STATIC_DRAW)
-
-    element_buffer = glGenBuffers(1)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.nbytes, index, GL_STATIC_DRAW)
+    eye = Sphere()
+    eye.set_shaders('res/glsl/chapter9.vs', 'res/glsl/chapter9.fs')
 
     while not glfw.window_should_close(window) and glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         cam.controller(window)
-
-        glUseProgram(program_id)
-        glUniformMatrix4fv(projection_id, 1, GL_FALSE, cam.projection)
-        glUniformMatrix4fv(view_id, 1, GL_FALSE, cam.view)
-        glUniformMatrix4fv(model_id, 1, GL_FALSE, model)
-
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, tex)
-        glUniform1i(texture_id, 0)
-
-        glEnableVertexAttribArray(0)
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-        glEnableVertexAttribArray(1)
-        glBindBuffer(GL_ARRAY_BUFFER, uv_buffer)
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-        glEnableVertexAttribArray(2)
-        glBindBuffer(GL_ARRAY_BUFFER, normal_buffer)
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer)
-        glDrawElements(GL_TRIANGLES, index.nbytes, GL_UNSIGNED_INT, None)
-
-        glDisableVertexAttribArray(0)
-        glDisableVertexAttribArray(1)
-        glDisableVertexAttribArray(2)
+        eye.projection = cam.projection
+        eye.view = cam.view
+        eye.render()
 
         glfw.swap_buffers(window)
         glfw.poll_events()
