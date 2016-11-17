@@ -45,8 +45,9 @@ class Model:
     view = property(get_view, set_view)
 
 class Wall(Model):
-    def __init__(self):
+    def __init__(self,ball):
         super().__init__()
+        self._ball = ball
         self._vertex = np.array([
             -1,-1,1,
             1,-1,1,
@@ -109,9 +110,14 @@ class Wall(Model):
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, self._index.nbytes, self._index, GL_STATIC_DRAW)
 
+    def set_shaders(self, vpath, fpath):
+        super().set_shaders(vpath, fpath)
+        self._ball_id = glGetUniformLocation(self._program, 'ball')
 
     def render(self):
         super().render()
+        glUniform1f(self._ball_id,self._ball.z)
+
         glEnableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)

@@ -46,11 +46,6 @@ def main():
     player.view = view
     player.set_shaders('res/glsl/breakout_player.vs', 'res/glsl/breakout_player.fs')
 
-    wall = breakout.Wall()
-    wall.projection = projection
-    wall.view = view
-    wall.set_shaders('res/glsl/breakout_wall.vs', 'res/glsl/breakout_wall.fs')
-
     blocks = []
     X_NUM = 5
     Y_NUM = 5
@@ -71,6 +66,11 @@ def main():
     ball.projection = projection
     ball.view = view
     ball.set_shaders('res/glsl/breakout_ball.vs', 'res/glsl/breakout_ball.fs')
+
+    wall = breakout.Wall(ball)
+    wall.projection = projection
+    wall.view = view
+    wall.set_shaders('res/glsl/breakout_wall.vs', 'res/glsl/breakout_wall.fs')
 
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
