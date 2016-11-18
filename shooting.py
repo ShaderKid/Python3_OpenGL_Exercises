@@ -158,6 +158,9 @@ def main():
 
         for index,bullet in enumerate(bullets):
             bullet.update()
+            if (bullet.x < -500 or 500 < bullet.x) or (bullet.y < -500 or 500 < bullet.y) or (bullet.z < -500 or 500 < bullet.z):
+                bullets.pop(index)
+
             bullet.projection = cam.projection
             bullet.view = cam.view
             bullet.render()
