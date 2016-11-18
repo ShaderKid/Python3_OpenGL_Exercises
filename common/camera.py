@@ -74,7 +74,7 @@ def look_at(position, target, up):
 
 class Camera:
     def __init__(self, x, y, z, w, h):
-        self.__position = np.matrix([x,y,z],dtype=np.float32)
+        self.position = np.matrix([x,y,z],dtype=np.float32)
         self.__target = np.matrix([0,0,0],dtype=np.float32)
         self.__up = np.matrix([0,1,0],dtype=np.float32)
         self.__fov = 45.0
@@ -108,7 +108,7 @@ class Camera:
         self.__vertical_angle += self.__mouse_speed * float(self.__last_ypos - ypos)
 
         # カメラの向いている方向:球面座標から直交座標への変換
-        direction = np.matrix([
+        self.direction = np.matrix([
             np.cos(self.__vertical_angle) * np.sin(self.__horizontal_angle),
             np.sin(self.__vertical_angle),
             np.cos(self.__vertical_angle) * np.cos(self.__horizontal_angle)
@@ -122,28 +122,28 @@ class Camera:
         ], dtype=np.float32)
 
         # カメラの上方向:右方向と正面方向の外積
-        self.__up = np.cross(right, direction)
+        self.__up = np.cross(right, self.direction)
 
         if glfw.get_key(window, glfw.KEY_DOWN) is glfw.PRESS:
-            self.__position -= self.__up * delta_time * self.__speed
+            self.position -= self.__up * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_UP) is glfw.PRESS:
-            self.__position += self.__up * delta_time * self.__speed
+            self.position += self.__up * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_S) is glfw.PRESS:
-            self.__position -= direction * delta_time * self.__speed
+            self.position -= self.direction * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_W) is glfw.PRESS:
-            self.__position += direction * delta_time * self.__speed
+            self.position += self.direction * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_A) is glfw.PRESS:
-            self.__position -= right * delta_time * self.__speed
+            self.position -= right * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_D) is glfw.PRESS:
-            self.__position += right * delta_time * self.__speed
+            self.position += right * delta_time * self.__speed
         if glfw.get_key(window, glfw.KEY_I) is glfw.PRESS and self.__fov > 1.0:
             self.__fov -= 1.0
         if glfw.get_key(window, glfw.KEY_O) is glfw.PRESS and self.__fov < 180.0:
             self.__fov += 1.0
 
-        self.__target = self.__position + direction
+        self.__target = self.position + self.direction
         self.projection = perspective(self.__fov, self.__aspect, self.__near, self.__far)
-        self.view = look_at(self.__position, self.__target, self.__up)
+        self.view = look_at(self.position, self.__target, self.__up)
 
         self.__last_xpos, self.__last_ypos = xpos, ypos
         self.__last_time = current_time
