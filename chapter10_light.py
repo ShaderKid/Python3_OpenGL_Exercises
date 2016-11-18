@@ -5,6 +5,7 @@ from pyassimp import load
 from common.shader import load_shaders
 from common import camera
 from common import texture
+from common.primitive import Grid
 
 class Model:
     def __init__(self):
@@ -138,6 +139,8 @@ def main():
     res_x, res_y = glfw.get_window_size(window)
     cam = camera.Camera(0,0,2,res_x,res_y)
 
+    grid = Grid(0,0,0,10,10,10,10)
+
     eye = Sphere()
     eye.set_shaders('res/glsl/chapter10.vs', 'res/glsl/chapter10.fs')
 
@@ -145,6 +148,10 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         cam.controller(window)
+
+        grid.projection = cam.projection
+        grid.view = cam.view
+        grid.render()
 
         eye.projection = cam.projection
         eye.view = cam.view

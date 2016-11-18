@@ -10,7 +10,7 @@ def grid(w_num: int=1, d_num: int=1) -> np.ndarray:
         d_num = 1
 
     vertex = np.arange(0, (w_num+1)*(d_num+1)*3, dtype=np.float32)
-    index = np.arange(0, (w_num*2)*(d_num+1)*2, dtype=np.float32)
+    index = np.arange(0, (w_num*2)*(d_num+1)*2, dtype=np.uint32)
     size = 1
     cell_w = size / w_num
     cell_d = size / d_num
