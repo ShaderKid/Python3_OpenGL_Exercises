@@ -287,7 +287,7 @@ class Grid(Model):
     d = property(get_d,set_d)
 
 class Dragon(Model):
-    def __init__(self,x=0,y=0,z=0,w=0,h=0,d=0):
+    def __init__(self,x=0,y=0,z=0,w=1,h=1,d=1):
         super().__init__()
         self.x = x
         self.y = y
