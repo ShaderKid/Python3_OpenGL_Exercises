@@ -5,7 +5,7 @@ from pyassimp import load
 from common.shader import load_shaders
 from common import camera
 from common import texture
-from common.primitive import Grid,Dragon
+from common.primitive import Grid,Dragon,Suzanne
 
 class Model:
     def __init__(self):

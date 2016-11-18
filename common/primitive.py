@@ -238,7 +238,7 @@ class Model:
     view = property(get_view, set_view)
 
 class Grid(Model):
-    def __init__(self,x,y,z,w,d,w_num,d_num):
+    def __init__(self,x=0,y=0,z=0,w=1,d=1,w_num=1,d_num=1):
         super().__init__()
         self.x = x
         self.y = y
@@ -287,7 +287,7 @@ class Grid(Model):
     d = property(get_d,set_d)
 
 class Dragon(Model):
-    def __init__(self,x,y,z,w,h,d):
+    def __init__(self,x=0,y=0,z=0,w=0,h=0,d=0):
         super().__init__()
         self.x = x
         self.y = y
@@ -299,6 +299,80 @@ class Dragon(Model):
         self.set_shaders('res/glsl/dragon.vs','res/glsl/dragon.fs')
 
         scene = load('res/model/dragon.obj')
+        self._vertex = scene.meshes[0].vertices
+        self._normal = scene.meshes[0].normals
+        self._index = scene.meshes[0].faces
+
+        self._vertex_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._vertex.nbytes, self._vertex, GL_STATIC_DRAW)
+
+        self._normal_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._normal_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._normal.nbytes, self._normal, GL_STATIC_DRAW)
+
+        self._element_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, self._index.nbytes, self._index, GL_STATIC_DRAW)
+
+    def render(self):
+        super().render()
+
+        lightPos = np.array([4,4,4], dtype=np.float32)
+        glUniform3f(self._light_id, lightPos[0], lightPos[1], lightPos[2])
+
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glEnableVertexAttribArray(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._normal_buffer)
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glDrawElements(GL_TRIANGLES, self._index.nbytes, GL_UNSIGNED_INT, None)
+
+        glDisableVertexAttribArray(0)
+        glDisableVertexAttribArray(1)
+
+    def get_w(self):
+        return self._scale[0,0]
+
+    def set_w(self,w):
+        self._scale[0,0] = w
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_h(self):
+        return self._scale[1,1]
+
+    def set_h(self,h):
+        self._scale[1,1] = h
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_d(self):
+        return self._scale[2,2]
+
+    def set_d(self,d):
+        self._scale[2,2] = d
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    w = property(get_w,set_w)
+    h = property(get_h,set_h)
+    d = property(get_d,set_d)
+
+class Suzanne(Model):
+    def __init__(self,x=0,y=0,z=0,w=1,h=1,d=1):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
+        self.h = h
+        self.d = d
+
+        self.set_shaders('res/glsl/suzanne.vs','res/glsl/suzanne.fs')
+
+        scene = load('res/model/suzanne.obj')
         self._vertex = scene.meshes[0].vertices
         self._normal = scene.meshes[0].normals
         self._index = scene.meshes[0].faces
