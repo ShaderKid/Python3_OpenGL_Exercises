@@ -13,7 +13,7 @@ void main() {
   vec3 LightColor = vec3(1,1,1);
   float LightPower = 50.0f;
 
-  vec3 DiffuseColor = vec3(0.8,0.0,0.0);
+  vec3 DiffuseColor = vec3(0.8,0.8,0.8);
   vec3 AmbientColor = vec3(0.1,0.1,0.1) * DiffuseColor;
   vec3 SpecularColor = vec3(0.3,0.3,0.3);
 
