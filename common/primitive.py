@@ -1,16 +1,34 @@
+from OpenGL.GL import *
 import numpy as np
+from pyassimp import load
+from .shader import load_shaders
 
-#def grid(w_num: int=1, h_num: int=1) -> np.ndarray:
-#    if w_num == 0:
-#        w_num = 1
-#    if h_num == 0:
-#        h_num = 1
-#
-#    vertex = np.arange(0, (w_num+1+h_num+1)*2, dtype=np.float32)
-#    for w in range(w_num+1):
-#
-#
-#    return vertex
+def grid(w_num: int=1, d_num: int=1) -> np.ndarray:
+    if w_num == 0:
+        w_num = 1
+    if d_num == 0:
+        d_num = 1
+
+    vertex = np.arange(0, (w_num+1)*(d_num+1)*3, dtype=np.float32)
+    index = np.arange(0, (w_num*2)*(d_num+1)*2, dtype=np.float32)
+    size = 1
+    cell_w = size / w_num
+    cell_d = size / d_num
+    for z in range(d_num+1):
+        for x in range(w_num+1):
+            vertex[z*(3*(w_num+1))+3*x+0] = x*cell_w-size/2
+            vertex[z*(3*(w_num+1))+3*x+1] = 0
+            vertex[z*(3*(w_num+1))+3*x+2] = z*cell_d-size/2
+
+            if x is not w_num:
+                index[z*(2*(w_num))+2*x+0] = z*(w_num+1)+x
+                index[z*(2*(w_num))+2*x+1] = z*(w_num+1)+x+1
+
+            if z is not d_num:
+                index[z*(2*(w_num+1))+2*x+0+len(index)//2] = z*(w_num+1)+x
+                index[z*(2*(w_num+1))+2*x+1+len(index)//2] = (z+1)*(w_num+1)+x
+
+    return vertex,index
 
 def circle(x: float=0, y: float=0, z: float=0, r: float=1, v: float=3) -> np.ndarray:
     if (r is 0):
@@ -151,3 +169,119 @@ def box():
         ], dtype=np.uint32)
 
     return v,c,i
+
+class Model:
+    def __init__(self):
+        self._vertex = None
+        self._program = None
+        self._projection = None
+        self._view = None
+        self._model = np.matrix(np.identity(4), dtype=np.float32)
+        self._translate = np.matrix(np.identity(4), dtype=np.float32)
+        self._rotate = np.matrix(np.identity(4), dtype=np.float32)
+        self._scale = np.matrix(np.identity(4), dtype=np.float32)
+
+    def set_shaders(self, vpath, fpath):
+        self._program = load_shaders(vpath, fpath)
+        self._projection_id = glGetUniformLocation(self._program, 'P')
+        self._view_id= glGetUniformLocation(self._program, 'V')
+        self._model_id = glGetUniformLocation(self._program, 'M')
+        self._light_id = glGetUniformLocation(self._program, 'LightPosition_w');
+
+    def get_x(self):
+        return self._translate[0,3]
+
+    def set_x(self,x):
+        self._translate[0,3] = x
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_y(self):
+        return self._translate[1,3]
+
+    def set_y(self,y):
+        self._translate[1,3] = y
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_z(self):
+        return self._translate[2,3]
+
+    def set_z(self,z):
+        self._translate[2,3] = z
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_projection(self):
+        return self._projection
+
+    def set_projection(self,p):
+        self._projection = p
+
+    def get_view(self):
+        return self._view
+
+    def set_view(self,v):
+        self._view = v
+
+    def update(self):
+        pass
+
+    def render(self):
+        glUseProgram(self._program)
+
+        glUniformMatrix4fv(self._projection_id, 1, GL_FALSE, self._projection)
+        glUniformMatrix4fv(self._view_id, 1, GL_FALSE, self._view)
+        glUniformMatrix4fv(self._model_id, 1, GL_FALSE, self._model)
+
+    x = property(get_x, set_x)
+    y = property(get_y, set_y)
+    z = property(get_z, set_z)
+    projection = property(get_projection, set_projection)
+    view = property(get_view, set_view)
+
+class Grid(Model):
+    def __init__(self,x,y,z,w,d,w_num,d_num):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
+        self.d = d
+
+        self.set_shaders('res/glsl/grid.vs','res/glsl/grid.fs')
+        self._vertex, self._index = grid(w_num,d_num)
+
+        self._vertex_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glBufferData(GL_ARRAY_BUFFER, self._vertex.nbytes, self._vertex, GL_STATIC_DRAW)
+
+        self._element_buffer = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, self._index.nbytes, self._index, GL_STATIC_DRAW)
+
+    def render(self):
+        super().render()
+
+        glEnableVertexAttribArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._element_buffer)
+        glDrawElements(GL_LINES, self._index.nbytes, GL_UNSIGNED_INT, None)
+
+        glDisableVertexAttribArray(0)
+
+    def get_w(self):
+        return self._scale[0,0]
+
+    def set_w(self,w):
+        self._scale[0,0] = w
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    def get_d(self):
+        return self._scale[2,2]
+
+    def set_d(self,d):
+        self._scale[2,2] = d
+        self._model = (self._translate * self._rotate * self._scale).T
+
+    w = property(get_w,set_w)
+    d = property(get_d,set_d)
