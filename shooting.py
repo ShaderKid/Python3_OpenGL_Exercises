@@ -162,8 +162,6 @@ def main():
             bullet.view = cam.view
             bullet.render()
 
-        print(bullets)
-
         glfw.swap_buffers(window)
         glfw.poll_events()
 
